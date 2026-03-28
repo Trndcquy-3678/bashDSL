@@ -1,0 +1,13 @@
+# print "hello world" to stdout
+out "hello world" "stdout";
+# variables
+pub var x = 5;
+# functions
+pub func sayHi(name){
+	out "hi ${name}"
+}
+# this is a comment
+/*
+a multiline comment 
+(convert to bunch of oneline in bash)
+*/

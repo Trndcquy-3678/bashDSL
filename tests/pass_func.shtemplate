@@ -1,8 +1,0 @@
-func greet(name) {
-    var message = "hello";
-    out message;
-    out name;
-}
-
-var x = 5;
-greet(x);

@@ -1,4 +1,0 @@
-func myFunc() {
-    var secret = 123;
-}
-out secret; # This should fail because 'secret' is local to myFunc! 🛡️🛑
