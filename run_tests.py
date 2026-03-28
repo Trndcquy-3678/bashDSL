@@ -14,7 +14,7 @@ class TestRunner:
         
         passed, failed = 0, 0
         for filename in sorted(os.listdir(self.tests_dir)):
-            if filename.endswith('.shtemplate'):
+            if filename.endswith('.shtm'):
                 if self.run_test(filename):
                     passed += 1
                 else:

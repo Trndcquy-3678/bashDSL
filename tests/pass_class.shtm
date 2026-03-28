@@ -1,0 +1,10 @@
+class Human {
+    var greeting = "hello";
+    
+    func sayHi(name) {
+        out greeting;
+        out name;
+    }
+}
+
+Human.sayHi("quy");
