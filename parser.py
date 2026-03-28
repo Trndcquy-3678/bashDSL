@@ -36,7 +36,6 @@ class Parser:
             self.consume('IDENT')
             is_pub = True
             token = self.peek()
-            if not token: raise EOFError("What's 'pub' without a friend? (EOF after pub)")
 
         if token.type == 'IDENT':
             if token.value == 'var':
@@ -60,29 +59,33 @@ class Parser:
         token = self.peek()
         line, col = token.line, token.col
         self.consume('IDENT') # 'var'
-        name = self.consume('IDENT').value
+        name_token = self.consume('IDENT')
+        name, name_col = name_token.value, name_token.col
         self.consume('ASSIGN')
         val_token = self.peek()
-        val = self.consume().value
+        val, val_col = val_token.value, val_token.col
+        self.consume()
         is_ref = val_token.type == 'IDENT'
         vtype = 'INT' if val_token.type == 'NUMBER' else 'STRING'
         if self.peek() and self.peek().type == 'SEMICOLON':
             self.consume('SEMICOLON')
-        return VarDecl(line, col, name, val, vtype, is_local=self.in_func, is_ref=is_ref)
+        return VarDecl(line, col, name, name_col, val, val_col, vtype, is_local=self.in_func, is_ref=is_ref)
 
     def parse_out(self):
         token = self.peek()
         line, col = token.line, token.col
         self.consume('IDENT') # 'out'
-        values, types, refs = [], [], []
+        values, val_cols, types, refs = [], [], [], []
         while self.peek() and self.peek().type not in ['SEMICOLON', 'CBRACE', 'NEWLINE']:
             val_token = self.peek()
-            values.append(self.consume().value)
+            values.append(val_token.value)
+            val_cols.append(val_token.col)
             types.append('INT' if val_token.type == 'NUMBER' else 'STRING')
             refs.append(val_token.type == 'IDENT')
+            self.consume()
         if self.peek() and self.peek().type == 'SEMICOLON':
             self.consume('SEMICOLON')
-        return OutStmt(line, col, values, types, refs)
+        return OutStmt(line, col, values, val_cols, types, refs)
 
     def parse_func_def(self):
         token = self.peek()
@@ -105,7 +108,7 @@ class Parser:
             if stmt: body.append(stmt)
         self.consume('CBRACE')
         self.in_func = old_in_func
-        return FuncDef(line, col, name, args, body)
+        return FuncDef(line, col, name, body=body, args=args)
 
     def parse_class_def(self):
         token = self.peek()
@@ -148,22 +151,26 @@ class Parser:
         token = self.peek()
         line, col = token.line, token.col
         exec_name = self.consume('IDENT').value
-        args, arg_is_ref = [], []
+        args, arg_cols, arg_is_ref = [], [], []
         if self.peek() and self.peek().type == 'OPAR':
             self.consume('OPAR')
             while self.peek() and self.peek().type != 'CPAR':
                 t = self.peek()
-                args.append(self.consume().value)
+                args.append(t.value)
+                arg_cols.append(t.col)
                 arg_is_ref.append(t.type == 'IDENT')
+                self.consume()
                 if self.peek() and self.peek().type == 'COMMA': self.consume('COMMA')
             self.consume('CPAR')
         else:
             while self.peek() and self.peek().type not in ['SEMICOLON', 'CBRACE']:
                 t = self.peek()
-                args.append(self.consume().value)
+                args.append(t.value)
+                arg_cols.append(t.col)
                 arg_is_ref.append(t.type == 'IDENT')
+                self.consume()
         if self.peek() and self.peek().type == 'SEMICOLON': self.consume('SEMICOLON')
-        return RunStmt(line, col, exec_name, args, arg_is_ref=arg_is_ref)
+        return RunStmt(line, col, exec_name, args, arg_cols, arg_is_ref=arg_is_ref)
 
     def parse_all(self):
         nodes = []

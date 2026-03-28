@@ -1,39 +1,40 @@
 from nodes import VarDecl, OutStmt, RunStmt, FuncDef, ClassDef, MethodDef, Comment
 
 class DSLVibeError(Exception):
-    def __init__(self, message, node, file_path, code):
+    def __init__(self, message, line, col, file_path, code):
         self.message = message
-        self.node = node
+        self.line = line
+        self.col = col
         self.file_path = file_path
         self.code = code
 
     def __str__(self):
         lines = self.code.split('\n')
-        line_idx = self.node.line - 1
-        col_idx = self.node.col - 1
+        line_idx = self.line - 1
+        col_idx = self.col - 1
         
         error_msg = [
-            f"⛔ Error: {self.message} on line {self.node.line}",
-            f"Last call stopped at {self.file_path}:{self.node.line}:{self.node.col}",
+            f"⛔ Error: {self.message} on line {self.line}",
+            f"Last call stopped at {self.file_path}:{self.line}:{self.col}",
             "\nStack trace:"
         ]
         
         # Show previous line
         if line_idx > 0:
-            error_msg.append(f"| {self.node.line - 1} {lines[line_idx - 1]}")
+            error_msg.append(f"| {self.line - 1} {lines[line_idx - 1]}")
             
         # Show actual erroring line
         actual_line = lines[line_idx]
-        error_msg.append(f"| {self.node.line} {actual_line}")
+        error_msg.append(f"| {self.line} {actual_line}")
         
-        # Add the caret pointer
-        prefix = f"| {self.node.line} "
-        pointer = " " * (len(prefix) + col_idx - 3) + "^~~~~~"
+        # 📐 FIX: Pointer math (exact alignment!)
+        prefix = f"| {self.line} "
+        pointer = " " * (len(prefix) + col_idx - 1) + "^~~~~~"
         error_msg.append(pointer)
         
         # Show next line
         if line_idx < len(lines) - 1:
-            error_msg.append(f"| {self.node.line + 1} {lines[line_idx + 1]}")
+            error_msg.append(f"| {self.line + 1} {lines[line_idx + 1]}")
             
         return "\n".join(error_msg)
 
@@ -57,23 +58,27 @@ class TypeChecker:
             if isinstance(node, Comment): continue
 
             if isinstance(node, VarDecl):
+                # Check for duplicate: point to the NAME, not 'var' 🎯
+                if self.lookup(node.name):
+                    raise DSLVibeError(f"duplicate definition of '{node.name}'", node.line, node.name_col, self.file_path, self.code)
+                
+                # Check reference: point to the VALUE 🎯
                 if node.is_ref:
                     if not self.lookup(node.value):
-                        raise DSLVibeError(f"undefined token '{node.value}'", node, self.file_path, self.code)
-                if node.name in self.current_scope():
-                    raise DSLVibeError(f"duplicate definition of '{node.name}'", node, self.file_path, self.code)
+                        raise DSLVibeError(f"undefined token '{node.value}'", node.line, node.value_col, self.file_path, self.code)
+                
                 self.current_scope()[node.name] = node.value_type
             
             elif isinstance(node, OutStmt):
-                for val, is_ref in zip(node.values, node.refs):
+                for val, col, is_ref in zip(node.values, node.val_cols, node.refs):
                     if is_ref and not self.lookup(val):
-                        raise DSLVibeError(f"undefined token '{val}'", node, self.file_path, self.code)
+                        # Point exactly to the offending variable! 🎯
+                        raise DSLVibeError(f"undefined token '{val}'", node.line, col, self.file_path, self.code)
             
             elif isinstance(node, RunStmt):
-                if node.arg_is_ref:
-                    for arg, is_ref in zip(node.args, node.arg_is_ref):
-                        if is_ref and not self.lookup(arg):
-                            raise DSLVibeError(f"undefined token '{arg}'", node, self.file_path, self.code)
+                for arg, col, is_ref in zip(node.args, node.arg_cols, node.arg_is_ref):
+                    if is_ref and not self.lookup(arg):
+                        raise DSLVibeError(f"undefined token '{arg}'", node.line, col, self.file_path, self.code)
             
             elif isinstance(node, FuncDef):
                 new_scope = {arg: 'STRING' for arg in node.args}

@@ -1,2 +1,5 @@
 var x = 5;
-var x = "hello";
+
+func myFunc() {
+    var x = 10; # This should FAIL now because x is already in the building! 🛡️🛑
+}
