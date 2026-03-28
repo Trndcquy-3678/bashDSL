@@ -46,11 +46,11 @@ def start_repl():
             checker.check(nodes)
 
             # 3. Generate & Execute
-            # We don't want the header every time in REPL
             if not hasattr(generate_bash, 'called'):
                 generate_bash.called = True
             
-            bash_code = generate_bash(nodes)
+            # 🧬 Fix: Skip cleanup in REPL so variables persist!
+            bash_code = generate_bash(nodes, skip_cleanup=True)
             
             # Feed to persistent shell
             shell.stdin.write(bash_code + "\n")

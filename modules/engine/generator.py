@@ -1,6 +1,6 @@
 from modules.core.nodes import VarDecl, OutStmt, RunStmt, FuncDef, ClassDef, Comment
 
-def generate_bash(nodes) -> str:
+def generate_bash(nodes, skip_cleanup=False) -> str:
     lines = []
     globals_to_unset = []
     
@@ -63,7 +63,7 @@ def generate_bash(nodes) -> str:
             
             old_called = getattr(generate_bash, 'called', False)
             generate_bash.called = True 
-            body_code = generate_bash(node.body)
+            body_code = generate_bash(node.body, skip_cleanup=True)
             generate_bash.called = old_called
             
             for body_line in body_code.split('\n'):
@@ -80,13 +80,14 @@ def generate_bash(nodes) -> str:
                     lines.append(f"  local {arg}=\"${i+1}\"")
                 old_called = getattr(generate_bash, 'called', False)
                 generate_bash.called = True 
-                body_code = generate_bash(method.body)
+                body_code = generate_bash(method.body, skip_cleanup=True)
                 generate_bash.called = old_called
                 for line in body_code.split('\n'):
                     if line: lines.append(f"  {line}")
                 lines.append("}")
 
-    if globals_to_unset:
+    # 🧹 Cleanup Phase: Only if NOT skipping!
+    if globals_to_unset and not skip_cleanup:
         lines.append("# Cleanup: Localizing script-level variables")
         for name in globals_to_unset:
             lines.append(f"unset {name}")
