@@ -151,6 +151,13 @@ class Parser:
         token = self.peek()
         line, col = token.line, token.col
         exec_name = self.consume('IDENT').value
+        
+        # 🏛️ Handle Class.method() calls!
+        if self.peek() and self.peek().type == 'DOT':
+            self.consume('DOT')
+            method_name = self.consume('IDENT').value
+            exec_name = f"{exec_name}:{method_name}"
+
         args, arg_cols, arg_is_ref = [], [], []
         if self.peek() and self.peek().type == 'OPAR':
             self.consume('OPAR')

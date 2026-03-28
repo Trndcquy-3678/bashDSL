@@ -72,6 +72,27 @@ def generate_bash(nodes) -> str:
                 if body_line: lines.append(f"  {body_line}")
             lines.append("}")
 
+        elif isinstance(node, ClassDef):
+            lines.append(f"# Class: {node.name}")
+            # Fields: Bash variables can't have colons, so we keep '_'
+            for field in node.fields:
+                lines.append(f"{node.name}_{field.name}={field.value}")
+            
+            # Methods: Bash functions CAN have colons! 🏛️✨
+            for method in node.methods:
+                lines.append(f"{node.name}:{method.name}() {{")
+                for i, arg in enumerate(method.args):
+                    lines.append(f"  local {arg}=\"${i+1}\"")
+                
+                old_called = getattr(generate_bash, 'called', False)
+                generate_bash.called = True 
+                body_code = generate_bash(method.body)
+                generate_bash.called = old_called
+                
+                for line in body_code.split('\n'):
+                    if line: lines.append(f"  {line}")
+                lines.append("}")
+
     # 🧹 Cleanup Phase: Unset globals at the very end
     if globals_to_unset:
         lines.append("# Cleanup: Localizing script-level variables")
