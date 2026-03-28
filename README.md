@@ -22,7 +22,7 @@ Transpile your `.shtm` to a Bash script:
 ```
 
 ## 📖 Learn More
-Check out the [Architecture](./docs/ARCHITECTURE.md), [Features](./docs/FEATURES.md), or the [WIKI](./docs/WIKI.md) for more info!
+Check out the [Architecture](./docs/devs/ARCHITECTURE.md), [Features](./docs/devs/FEATURES.md), or the [WIKI](./docs/wiki/) for more info!
 
 ## 📜 License
 MIT License. Check out the [LICENSE](./LICENSE) file for more info. 🏁✨
