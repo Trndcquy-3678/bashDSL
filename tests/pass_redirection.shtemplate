@@ -1,0 +1,3 @@
+out "this goes to stdout" "stdout";
+out "this goes to stderr" "stderr";
+out "this is normal";
