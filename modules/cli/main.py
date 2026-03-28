@@ -1,4 +1,9 @@
 import sys
+import os
+
+# 🔧 Fix: Ensure the project root is in sys.path so we can find 'modules'
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
 from modules.core.lexer import tokenize
 from modules.core.parser import Parser
 from modules.engine.generator import generate_bash
@@ -7,7 +12,7 @@ from modules.engine.checker import TypeChecker, DSLVibeError
 def main():
     if len(sys.argv) < 2:
         # 🚀 No file provided? Launch the REPL! ✨
-        from .repl import start_repl
+        from modules.cli.repl import start_repl
         start_repl()
         return
 
