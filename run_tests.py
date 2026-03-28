@@ -34,7 +34,7 @@ class TestRunner:
         
         if should_fail:
             if result.returncode != 0:
-                print(f"✅ PASSED: {filename} (Failed as expected: {result.stdout.strip()})")
+                print(f"✅ PASSED: {filename} Failed as expected:\n\n{result.stdout.strip()}")
                 return True
             else:
                 print(f"❌ FAILED: {filename} (Expected failure, but it passed! Oops.)")
@@ -44,7 +44,7 @@ class TestRunner:
                 print(f"✅ PASSED: {filename} (Transpiled successfully! ✨)")
                 return True
             else:
-                print(f"❌ FAILED: {filename} (Unexpected error: {result.stdout.strip()})")
+                print(f"❌ FAILED: {filename} Unexpected error:\n\n{result.stdout.strip()}")
                 return False
 
 if __name__ == "__main__":
