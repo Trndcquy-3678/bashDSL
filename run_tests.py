@@ -29,7 +29,7 @@ class TestRunner:
         filepath = os.path.join(self.tests_dir, filename)
         should_fail = filename.startswith('fail_')
         
-        cmd = [self.python_path, 'main.py', filepath]
+        cmd = [self.python_path, '-m', 'modules.cli.main', filepath]
         result = subprocess.run(cmd, capture_output=True, text=True)
         
         if should_fail:
