@@ -1,40 +1,51 @@
 from dataclasses import dataclass, field
 
 @dataclass
-class Comment:
-    value: str
+class Node:
+    line: int = 0
+    col: int = 0
+
+@dataclass
+class Comment(Node):
+    value: str = ""
     multi_line: bool = False
 
 @dataclass
-class VarDecl:
-    name: str
-    value: str
-    value_type: str
+class VarDecl(Node):
+    name: str = ""
+    value: str = ""
+    value_type: str = ""
     is_pub: bool = False
     is_local: bool = False
     is_ref: bool = False
 
 @dataclass
-class OutStmt:
+class OutStmt(Node):
     values: list[str] = field(default_factory=list)
     types: list[str] = field(default_factory=list)
     refs: list[bool] = field(default_factory=list)
 
 @dataclass
-class RunStmt:
-    executable: str
-    args: list[str]
+class RunStmt(Node):
+    executable: str = ""
+    args: list[str] = field(default_factory=list)
     arg_is_ref: list[bool] = None 
 
 @dataclass
-class FuncDef:
-    name: str
-    args: list[str]
-    body: list
+class MethodDef(Node):
+    name: str = ""
+    args: list[str] = field(default_factory=list)
+    body: list = field(default_factory=list)
+
+@dataclass
+class FuncDef(Node):
+    name: str = ""
+    args: list[str] = field(default_factory=list)
+    body: list = field(default_factory=list)
     is_pub: bool = False
 
 @dataclass
-class ClassDef:
-    name: str
-    methods: list = field(default_factory=list)
-    fields: list = field(default_factory=list)
+class ClassDef(Node):
+    name: str = ""
+    methods: list[MethodDef] = field(default_factory=list)
+    fields: list[VarDecl] = field(default_factory=list)

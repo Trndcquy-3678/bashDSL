@@ -1,5 +1,5 @@
 from lexer import Token, tokenize
-from nodes import VarDecl, OutStmt, RunStmt, FuncDef, ClassDef, Comment
+from nodes import VarDecl, OutStmt, RunStmt, FuncDef, ClassDef, Comment, MethodDef
 
 class Parser:
     def __init__(self, tokens: list[Token]):
@@ -17,7 +17,7 @@ class Parser:
         if not token:
             raise EOFError("Yo, we're at the end of the file!")
         if expected_type and token.type != expected_type:
-            raise SyntaxError(f"Line {token.line}: Expected {expected_type}, but got {token.type} ('{token.value}')")
+            raise SyntaxError(f"Line {token.line}, Col {token.col}: Expected {expected_type}, but got {token.type} ('{token.value}')")
         self.pos += 1
         return token
 
@@ -25,16 +25,18 @@ class Parser:
         token = self.peek()
         if not token: return None
 
+        line, col = token.line, token.col
         if token.type == 'COMMENT_SINGLE':
-            return Comment(self.consume().value[1:].strip(), False)
+            return Comment(line, col, self.consume().value[1:].strip(), False)
         elif token.type == 'COMMENT_MULTI':
-            return Comment(self.consume().value[2:-2].strip(), True)
+            return Comment(line, col, self.consume().value[2:-2].strip(), True)
 
         is_pub = False
         if token.type == 'IDENT' and token.value == 'pub':
             self.consume('IDENT')
             is_pub = True
             token = self.peek()
+            if not token: raise EOFError("What's 'pub' without a friend? (EOF after pub)")
 
         if token.type == 'IDENT':
             if token.value == 'var':
@@ -47,12 +49,16 @@ class Parser:
                 node = self.parse_func_def()
                 if isinstance(node, FuncDef): node.is_pub = is_pub
                 return node
+            elif token.value == 'class':
+                return self.parse_class_def()
             else:
                 return self.parse_run()
         
-        raise SyntaxError(f"Line {token.line}: Wait, I don't know what to do with {token.value}")
+        raise SyntaxError(f"Line {token.line}, Col {token.col}: Wait, I don't know what to do with '{token.value}'")
 
     def parse_var_decl(self):
+        token = self.peek()
+        line, col = token.line, token.col
         self.consume('IDENT') # 'var'
         name = self.consume('IDENT').value
         self.consume('ASSIGN')
@@ -60,13 +66,13 @@ class Parser:
         val = self.consume().value
         is_ref = val_token.type == 'IDENT'
         vtype = 'INT' if val_token.type == 'NUMBER' else 'STRING'
-        
-        # Semicolon is optional if at the end of a line or before a CBRACE
         if self.peek() and self.peek().type == 'SEMICOLON':
             self.consume('SEMICOLON')
-        return VarDecl(name, val, vtype, is_local=self.in_func, is_ref=is_ref)
+        return VarDecl(line, col, name, val, vtype, is_local=self.in_func, is_ref=is_ref)
 
     def parse_out(self):
+        token = self.peek()
+        line, col = token.line, token.col
         self.consume('IDENT') # 'out'
         values, types, refs = [], [], []
         while self.peek() and self.peek().type not in ['SEMICOLON', 'CBRACE', 'NEWLINE']:
@@ -74,12 +80,13 @@ class Parser:
             values.append(self.consume().value)
             types.append('INT' if val_token.type == 'NUMBER' else 'STRING')
             refs.append(val_token.type == 'IDENT')
-        
         if self.peek() and self.peek().type == 'SEMICOLON':
             self.consume('SEMICOLON')
-        return OutStmt(values, types, refs)
+        return OutStmt(line, col, values, types, refs)
 
     def parse_func_def(self):
+        token = self.peek()
+        line, col = token.line, token.col
         self.consume('IDENT') # 'func'
         name = self.consume('IDENT').value
         self.consume('OPAR')
@@ -98,29 +105,65 @@ class Parser:
             if stmt: body.append(stmt)
         self.consume('CBRACE')
         self.in_func = old_in_func
-        return FuncDef(name, args, body)
+        return FuncDef(line, col, name, args, body)
+
+    def parse_class_def(self):
+        token = self.peek()
+        line, col = token.line, token.col
+        self.consume('IDENT') # 'class'
+        name = self.consume('IDENT').value
+        self.consume('OBRACE')
+        methods, fields = [], []
+        while self.peek() and self.peek().type != 'CBRACE':
+            t = self.peek()
+            if t.value == 'func':
+                methods.append(self.parse_method_def())
+            elif t.value == 'var':
+                fields.append(self.parse_var_decl())
+            else: self.pos += 1
+        self.consume('CBRACE')
+        return ClassDef(line, col, name, methods, fields)
+
+    def parse_method_def(self):
+        token = self.peek()
+        line, col = token.line, token.col
+        self.consume('IDENT') # 'func'
+        name = self.consume('IDENT').value
+        self.consume('OPAR')
+        args = []
+        while self.peek() and self.peek().type != 'CPAR':
+            args.append(self.consume('IDENT').value)
+            if self.peek() and self.peek().type == 'COMMA':
+                self.consume('COMMA')
+        self.consume('CPAR')
+        self.consume('OBRACE')
+        body = []
+        while self.peek() and self.peek().type != 'CBRACE':
+            stmt = self.parse_statement()
+            if stmt: body.append(stmt)
+        self.consume('CBRACE')
+        return MethodDef(line, col, name, args, body)
 
     def parse_run(self):
+        token = self.peek()
+        line, col = token.line, token.col
         exec_name = self.consume('IDENT').value
         args, arg_is_ref = [], []
         if self.peek() and self.peek().type == 'OPAR':
             self.consume('OPAR')
             while self.peek() and self.peek().type != 'CPAR':
-                token = self.peek()
+                t = self.peek()
                 args.append(self.consume().value)
-                arg_is_ref.append(token.type == 'IDENT')
-                if self.peek() and self.peek().type == 'COMMA':
-                    self.consume('COMMA')
+                arg_is_ref.append(t.type == 'IDENT')
+                if self.peek() and self.peek().type == 'COMMA': self.consume('COMMA')
             self.consume('CPAR')
         else:
             while self.peek() and self.peek().type not in ['SEMICOLON', 'CBRACE']:
-                token = self.peek()
+                t = self.peek()
                 args.append(self.consume().value)
-                arg_is_ref.append(token.type == 'IDENT')
-        
-        if self.peek() and self.peek().type == 'SEMICOLON':
-            self.consume('SEMICOLON')
-        return RunStmt(exec_name, args, arg_is_ref=arg_is_ref)
+                arg_is_ref.append(t.type == 'IDENT')
+        if self.peek() and self.peek().type == 'SEMICOLON': self.consume('SEMICOLON')
+        return RunStmt(line, col, exec_name, args, arg_is_ref=arg_is_ref)
 
     def parse_all(self):
         nodes = []

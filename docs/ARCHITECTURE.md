@@ -17,10 +17,12 @@ Yo! Here's how the magic happens under the hood. 🪄
 
 ## 3. Type Checker (`checker.py`) 🛡️
 - **Role**: The "Bouncer" 🚪. It walks the AST to find errors *before* any Bash is written.
-- **Vibe**: 
-  - Tracks types (`INT` vs `STRING`).
-  - Blocks **Duplicate Definition** (re-declaring with `var`).
-  - Handles **Scopes** (a stack of symbol tables) for functions so locals don't leak. 🏢
+- **Elite Error Reporting**: 💅✨
+  - **DSLVibeError**: Custom exception that tracks `line` and `col`.
+  - **Visual Caret**: Points exactly to the offending token with a `^~~~~~` pointer.
+  - **Stack Trace**: Shows the surrounding code lines for context.
+  - **Duplicate & Undefined Checks**: Blocks re-declarations and usage of variables that don't exist in the active scope.
+- **Vibe**: Handles **Scopes** (a stack of symbol tables) for functions and classes so locals don't leak. 🏢
 
 ## 4. Generator (`generator.py`) 🎭
 - **Role**: The translator. Turns AST nodes into POSIX-compliant Bash.
