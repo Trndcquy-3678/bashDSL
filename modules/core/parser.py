@@ -50,6 +50,10 @@ class Parser:
                 return node
             elif token.value == 'class':
                 return self.parse_class_def()
+            elif token.value == 'run':
+                # 🏃‍♂️💨 Explicitly run a system command!
+                self.consume('IDENT') # 'run'
+                return self.parse_run(force_run=True)
             else:
                 return self.parse_run()
         
@@ -147,13 +151,13 @@ class Parser:
         self.consume('CBRACE')
         return MethodDef(line, col, name, args, body)
 
-    def parse_run(self):
+    def parse_run(self, force_run=False):
         token = self.peek()
         line, col = token.line, token.col
         exec_name = self.consume('IDENT').value
         
         # 🏛️ Handle Class.method() calls!
-        if self.peek() and self.peek().type == 'DOT':
+        if not force_run and self.peek() and self.peek().type == 'DOT':
             self.consume('DOT')
             method_name = self.consume('IDENT').value
             exec_name = f"{exec_name}:{method_name}"

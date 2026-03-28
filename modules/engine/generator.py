@@ -52,6 +52,8 @@ def generate_bash(nodes, skip_cleanup=False) -> str:
                     args.append(f"${arg}" if is_ref else arg)
             else:
                 args = node.args
+            
+            # 🏃‍♂️💨 Just generate the executable name (we only use 'run' for checking!)
             lines.append(f"{node.executable} {' '.join(args)}")
         
         elif isinstance(node, FuncDef):
