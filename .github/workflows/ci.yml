@@ -1,4 +1,4 @@
-name: bashDSL Vibe Check 💅🧪
+name: bashDSL test suite checker
 
 on:
   push:
@@ -18,5 +18,5 @@ jobs:
       with:
         python-version: '3.13'
 
-    - name: Run Modular Vibe Check 🚀
+    - name: Run Test
       run: python3 run_tests.py
