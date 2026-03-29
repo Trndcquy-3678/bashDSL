@@ -9,3 +9,5 @@
 - always respect existing code
 - write good documentation about what you did
 - always ask me when you're unsure
+- don't use emojis in code, docs and commits, PLEASE!
+- being *a little bit* stiff in code files.
