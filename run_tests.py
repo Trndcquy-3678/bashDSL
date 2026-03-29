@@ -6,7 +6,8 @@ import sys
 class TestRunner:
     def __init__(self, tests_dir='tests'):
         self.tests_dir = tests_dir
-        self.python_path = '/data/data/com.termux/files/usr/bin/python3'
+        # 🧠 Fix: Use the current Python interpreter (environment-agnostic!)
+        self.python_path = sys.executable
 
     def run_all(self):
         print("🚀 Running bashDSL Modular Vibe Check (The Test Suite) 💅")

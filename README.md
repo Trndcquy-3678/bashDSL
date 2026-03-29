@@ -13,12 +13,12 @@
 ## 🎮 Quick Start
 Transpile your `.shtm` to a Bash script:
 ```bash
-/data/data/com.termux/files/usr/bin/python3 main.py <file.shtm>
+python3 -m modules.cli.main <file.shtm>
 ```
 
 ## 🧪 Run the Test Suite
 ```bash
-/data/data/com.termux/files/usr/bin/python3 run_tests.py
+python3 run_tests.py
 ```
 
 ## 📖 Learn More
