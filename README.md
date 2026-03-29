@@ -1,5 +1,8 @@
 # bashDSL: The "TypeScript of Bash"
 
+>[!WARN]
+>this project is in beta stage (and also half AI driven), use it as your own risk
+
 bashDSL is a simple and strict DSL that transpiles to POSIX-compliant Bash. It focuses on safety, strict typing, and modern development experience for shell scripting. Built with Python 3 Standard Library.
 
 ## Features
@@ -30,6 +33,5 @@ python3 run_tests.py
 - [Architecture](./docs/devs/ARCHITECTURE.md)
 - [Features](./docs/devs/FEATURES.md)
 - [Wiki](./docs/wiki/)
-
 ## License
 MIT License. See [LICENSE](./LICENSE) for details.
