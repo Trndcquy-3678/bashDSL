@@ -8,6 +8,8 @@ language (:])
 ## Tech stack
 - Python (stdlib only)
 ## Example (script template)
-(read config.imports[2] :])
+(read config.imports[3] :])
 ## Agent Config
 (read config.imports[1] :])
+## Current codebase structure (full breakdown)
+read config.import[2]
