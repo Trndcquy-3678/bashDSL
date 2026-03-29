@@ -1,3 +1,0 @@
-imports:
-        - ./AGENT.md # [1] config for agent
-        - ./example.shtemplate # [2] template

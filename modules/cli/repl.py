@@ -11,8 +11,8 @@ from modules.engine.generator import generate_bash
 from modules.engine.checker import TypeChecker, DSLVibeError
 
 def start_repl():
-    print("💅 bashDSL Interactive REPL 🚀")
-    print("Type 'exit' to yeet, or 'help' for vibes. ✌️")
+    print("bashDSL Interactive REPL")
+    print("Type 'exit' to quit")
     print("-" * 30)
 
     # State: The bouncer remembers everything 🛡️
@@ -30,7 +30,7 @@ def start_repl():
 
     while True:
         try:
-            code = input("✨ > ")
+            code = input(">>> ")
             if code.strip() == "exit":
                 break
             if not code.strip():
@@ -57,12 +57,12 @@ def start_repl():
             shell.stdin.flush()
             
         except EOFError:
-            print("\nYeeted! ✌️")
+            print("\nBye!")
             break
         except DSLVibeError as e:
             print(e)
         except Exception as e:
-            print(f"⛔ Bummer! {e}")
+            print(f"⛔ Error: {e}")
 
     shell.terminate()
 
