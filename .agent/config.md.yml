@@ -1,3 +1,4 @@
 imports:
-        - ./AGENT.md # [1] config for agent
-        - ../example.shtm # [2] template (moved from .shtemplate to .shtm)
+        - ./AGENT.md    # [1] config for agent
+        - ./CODEBASE.md # [2] Ultimate Brain Dump (Context Preservation)
+        - ../example.shtm # [3] template
