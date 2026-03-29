@@ -2,15 +2,14 @@ import subprocess
 import os
 import sys
 
-# The Test Runner (The Brains 🧠)
+# The Test Runner
 class TestRunner:
     def __init__(self, tests_dir='tests'):
         self.tests_dir = tests_dir
-        # 🧠 Fix: Use the current Python interpreter (environment-agnostic!)
         self.python_path = sys.executable
 
     def run_all(self):
-        print("🚀 Running bashDSL Modular Vibe Check (The Test Suite) 💅")
+        print("Running bashDSL Test Suite")
         print("-" * 60)
         
         passed, failed = 0, 0
@@ -22,7 +21,7 @@ class TestRunner:
                     failed += 1
         
         print("-" * 60)
-        print(f"✨ Vibe check complete! (Passed: {passed}, Failed: {failed}) 💅")
+        print(f"Test Suite Results: Passed: {passed}, Failed: {failed}")
         if failed > 0:
             sys.exit(1)
 
@@ -35,17 +34,17 @@ class TestRunner:
         
         if should_fail:
             if result.returncode != 0:
-                print(f"✅ PASSED: {filename} Failed as expected:\n\n{result.stdout.strip()}")
+                print(f"PASS: {filename} (Failed as expected)")
                 return True
             else:
-                print(f"❌ FAILED: {filename} (Expected failure, but it passed! Oops.)")
+                print(f"FAIL: {filename} (Expected failure, but it passed)")
                 return False
         else:
             if result.returncode == 0:
-                print(f"✅ PASSED: {filename} (Transpiled successfully! ✨)")
+                print(f"PASS: {filename}")
                 return True
             else:
-                print(f"❌ FAILED: {filename} Unexpected error:\n\n{result.stdout.strip()}")
+                print(f"FAIL: {filename} (Unexpected error: {result.stdout.strip()})")
                 return False
 
 if __name__ == "__main__":

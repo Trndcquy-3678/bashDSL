@@ -1,44 +1,48 @@
-# ✨ bashDSL Features: The "TypeScript of Bash" 💅
+# Features
 
-## 1. Variables (`var`) 📦
-Declare a variable with `var`.
+bashDSL provides several high-level features designed to improve the shell scripting experience.
+
+## 1. Variables
+Variables are declared using the 'var' keyword. The transpiler performs basic type checking and prevents duplicate definitions.
 ```javascript
-var x = 5;       // INT
-var name = "Al"; // STRING
+var x = 10;
+var message = "Hello";
 ```
-- **Type Checking**: If you declare `var x = 5;` and then try `var x = "hello";`, the Bouncer 🚪 will stop you. 🛑
-- **No Duplicates**: You can't declare `var x` twice in the same scope. 🛡️
 
-## 2. Functions (`func`) 🎭
-Functions create their own local scope. 🏢
+## 2. Functions
+Functions support local scoping. Variables declared inside a function are generated as 'local' variables in the resulting Bash script.
 ```javascript
 func greet(name) {
-    var message = "hello";
-    out message;
-    out name;
+    var prefix = "Hi ";
+    out prefix name;
 }
 ```
-- **Local Scope**: `message` is local to `greet` and won't leak into the global scope. 🛡️
-- **Automatic `local`**: The generator uses `local` for these variables in Bash. ✨
 
-## 3. Output (`out`) 🗣️
-- `out "hi";` -> `echo "hi"` (Literal)
-- `out x;`    -> `echo $x`  (Reference) 💸
-
-## 4. Variable References 💸✨
-The parser automatically spots the difference between a value and a variable reference. If you use a variable without quotes, bashDSL slaps a `$` sign on it during generation. 🤑
+## 3. Classes
+OOP is simulated through namespacing. Methods are accessible via dot-notation and are transpiled to prefixed Bash functions.
 ```javascript
-var x = 5;
-var y = x; // y = $x
+class User {
+    var role = "guest";
+    func setRole(r) {
+        role = r;
+    }
+}
+User.setRole("admin");
 ```
 
-## 5. Command Runs 🏃💨
-Any name that isn't `var`, `func`, or `out` is treated as a shell command.
+## 4. Output and Redirection
+The 'out' statement supports multiple arguments and built-in redirection to stdout or stderr.
 ```javascript
-ls "-la";
-mkdir "new_dir";
+out "Operation successful" "stdout";
+out "Error occurred" "stderr";
 ```
-You can also use function calls:
+
+## 5. Explicit Command Execution
+To prevent accidental execution of shell commands, external executables must be prefixed with the 'run' keyword.
 ```javascript
-greet(x); // greet $x
+run ls "-la";
+run mkdir "build";
 ```
+
+## 6. Automatic Cleanup
+Variables declared at the script level are automatically unset at the end of the generated script, preventing environment pollution.

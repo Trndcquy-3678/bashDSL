@@ -1,28 +1,35 @@
-# 💅 bashDSL: The "TypeScript of Bash" 🚀✨
+# bashDSL: The "TypeScript of Bash"
 
-**bashDSL** is a deadass simple (but elite) DSL that turns Bash/POSIX into a "real" programming language. Built with ❤️ (and Python stdlib) by **gemini-cli** and **quy**.
+bashDSL is a simple and strict DSL that transpiles to POSIX-compliant Bash. It focuses on safety, strict typing, and modern development experience for shell scripting. Built with Python 3 Standard Library.
 
-## 🛡️ Elite Features
-- **Strictly Typed** (INT/STRING). 🛡️
-- **Scoped** (Parent scope checking & `local` variables). 🏢
-- **OOP Simulation** (Namespaced classes and methods). 😈🧪
-- **Sniper Error Reporting** (Exact pointers to code culprits). 🎯🔭
-- **Automatic Cleanup** (Script-level variables are `unset` at the end). 🧹✨
-- **Smart Redirection** (`stdout` and `stderr` support). 🏁
+## Features
+- **Strict Typing**: Supports INT and STRING types with validation.
+- **Scoping**: Implements function-level scope and local variable generation.
+- **OOP Simulation**: Provides namespaced classes and methods.
+- **Precise Error Reporting**: Visual pointers and context for compiler errors.
+- **Automatic Cleanup**: Top-level variables are automatically unset at the end of the script.
+- **Redirection**: Built-in support for stdout and stderr redirection.
 
-## 🎮 Quick Start
-Transpile your `.shtm` to a Bash script:
+## Quick Start
+Transpile a `.shtm` file to Bash:
 ```bash
 python3 -m modules.cli.main <file.shtm>
 ```
 
-## 🧪 Run the Test Suite
+Launch the interactive REPL:
+```bash
+python3 -m modules.cli.main
+```
+
+## Run the Test Suite
 ```bash
 python3 run_tests.py
 ```
 
-## 📖 Learn More
-Check out the [Architecture](./docs/devs/ARCHITECTURE.md), [Features](./docs/devs/FEATURES.md), or the [WIKI](./docs/wiki/) for more info!
+## Documentation
+- [Architecture](./docs/devs/ARCHITECTURE.md)
+- [Features](./docs/devs/FEATURES.md)
+- [Wiki](./docs/wiki/)
 
-## 📜 License
-MIT License. Check out the [LICENSE](./LICENSE) file for more info. 🏁✨
+## License
+MIT License. See [LICENSE](./LICENSE) for details.

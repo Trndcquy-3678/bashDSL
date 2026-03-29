@@ -1,31 +1,36 @@
-# 🎮 Usage: Running & Testing bashDSL 🏃‍♂️💨
+# Usage Guide
 
-Yo! Here's how to actually get this transpiler working. 🏎️💨
+Instructions for running and testing the bashDSL transpiler.
 
-## 🏗️ Transpiling Code
-Use `main.py` via the module path. 🏢🐍
+## Transpilation
+Use the Python module execution flag to run the main entry point.
+
 ```bash
 python3 -m modules.cli.main <file.shtm>
 ```
 
-### Example:
+### Example
 ```bash
 python3 -m modules.cli.main tests/pass_example.shtm
 ```
 
-## 🧪 Running the Test Suite
-The `run_tests.py` script is modular. 🧩✨ It discovers all files in the `tests/` directory and checks them based on their prefix:
-- `pass_*.shtm`: Expected to succeed. ✅
-- `fail_*.shtm`: Expected to fail. 🛑
+## Interactive REPL
+Running the main module without arguments launches the interactive REPL.
 
-### Run it like this:
+```bash
+python3 -m modules.cli.main
+```
+
+## Testing
+The test runner automatically discovers and executes tests located in the `tests/` directory.
+
 ```bash
 python3 run_tests.py
 ```
 
-## 🛡️ Adding a Test
-Just drop a new `.shtm` file into the `tests/` folder!
-- Name it `pass_my_test.shtm` if you want it to succeed.
-- Name it `fail_my_test.shtm` if you're testing the Bouncer 🚪 and want it to block something.
+### Test Naming Conventions
+- **pass_*.shtm**: Tests that are expected to transpile successfully.
+- **fail_*.shtm**: Tests designed to trigger specific compiler errors.
 
-Happy coding! 🚀✨
+## Adding New Tests
+To add a test case, create a new `.shtm` file in the `tests/` directory following the naming conventions above.

@@ -1,13 +1,28 @@
-# 🏢 Classes & OOP (Mad Scientist Mode 🧪)
+# Classes and OOP Simulation
 
-Simulated OOP in Bash using namespacing.
+bashDSL simulates Object-Oriented Programming constructs through namespacing and prefixed generation.
+
+## Class Definition
+Use the `class` keyword to group related fields and methods.
 ```javascript
-class Human {
-    var greeting = "hello";
-    func sayHi(name) {
-        out greeting name;
+class Logger {
+    var prefix = "[LOG]";
+    
+    func info(msg) {
+        out prefix msg;
     }
 }
-Human.sayHi("quy");
 ```
-- **How it works**: Transpiles to `Human_greeting` and `Human_sayHi()`. 🏛️
+
+## Method Calls
+Methods are called using dot-notation.
+```javascript
+Logger.info("System started");
+```
+
+## Internal Transpilation
+The generator converts class constructs into prefixed Bash elements:
+- **Fields**: Transpiled to `ClassName_FieldName`.
+- **Methods**: Transpiled to `ClassName:MethodName()` functions.
+
+This approach allows for structured code without requiring complex Bash object frameworks.

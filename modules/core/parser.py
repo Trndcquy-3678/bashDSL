@@ -15,7 +15,7 @@ class Parser:
     def consume(self, expected_type: str = None) -> Token:
         token = self.peek()
         if not token:
-            raise EOFError("Yo, we're at the end of the file!")
+            raise EOFError("Unexpected end of input")
         if expected_type and token.type != expected_type:
             raise SyntaxError(f"Line {token.line}, Col {token.col}: Expected {expected_type}, but got {token.type} ('{token.value}')")
         self.pos += 1
@@ -51,18 +51,17 @@ class Parser:
             elif token.value == 'class':
                 return self.parse_class_def()
             elif token.value == 'run':
-                # 🏃‍♂️💨 Explicitly run a system command!
-                self.consume('IDENT') # 'run'
+                self.consume('IDENT')
                 return self.parse_run(force_run=True)
             else:
                 return self.parse_run()
         
-        raise SyntaxError(f"Line {token.line}, Col {token.col}: Wait, I don't know what to do with '{token.value}'")
+        raise SyntaxError(f"Line {token.line}, Col {token.col}: Unexpected token '{token.value}'")
 
     def parse_var_decl(self):
         token = self.peek()
         line, col = token.line, token.col
-        self.consume('IDENT') # 'var'
+        self.consume('IDENT')
         name_token = self.consume('IDENT')
         name, name_col = name_token.value, name_token.col
         self.consume('ASSIGN')
@@ -78,7 +77,7 @@ class Parser:
     def parse_out(self):
         token = self.peek()
         line, col = token.line, token.col
-        self.consume('IDENT') # 'out'
+        self.consume('IDENT')
         values, val_cols, types, refs = [], [], [], []
         while self.peek() and self.peek().type not in ['SEMICOLON', 'CBRACE', 'NEWLINE']:
             val_token = self.peek()
@@ -94,7 +93,7 @@ class Parser:
     def parse_func_def(self):
         token = self.peek()
         line, col = token.line, token.col
-        self.consume('IDENT') # 'func'
+        self.consume('IDENT')
         name = self.consume('IDENT').value
         self.consume('OPAR')
         args = []
@@ -117,7 +116,7 @@ class Parser:
     def parse_class_def(self):
         token = self.peek()
         line, col = token.line, token.col
-        self.consume('IDENT') # 'class'
+        self.consume('IDENT')
         name = self.consume('IDENT').value
         self.consume('OBRACE')
         methods, fields = [], []
@@ -134,7 +133,7 @@ class Parser:
     def parse_method_def(self):
         token = self.peek()
         line, col = token.line, token.col
-        self.consume('IDENT') # 'func'
+        self.consume('IDENT')
         name = self.consume('IDENT').value
         self.consume('OPAR')
         args = []
@@ -156,7 +155,6 @@ class Parser:
         line, col = token.line, token.col
         exec_name = self.consume('IDENT').value
         
-        # 🏛️ Handle Class.method() calls!
         if not force_run and self.peek() and self.peek().type == 'DOT':
             self.consume('DOT')
             method_name = self.consume('IDENT').value

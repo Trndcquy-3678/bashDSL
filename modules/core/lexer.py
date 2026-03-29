@@ -49,7 +49,7 @@ def tokenize(code: str) -> list[Token]:
                 line_start = mo.start() + value.rfind('\n') + 1
             continue
         elif kind == 'MISMATCH':
-            raise RuntimeError(f'⛔ Error: Unexpected vibe "{value}" at Line {line_num}, Col {column}')
+            raise RuntimeError(f'Error: Unexpected character "{value}" at Line {line_num}, Col {column}')
         
         tokens.append(Token(kind, value, line_num, column))
     return tokens

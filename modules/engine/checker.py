@@ -12,23 +12,30 @@ class DSLVibeError(Exception):
         lines = self.code.split('\n')
         line_idx = self.line - 1
         col_idx = self.col - 1
+        
         error_msg = [
-            f"⛔ Error: {self.message} on line {self.line}",
-            f"Last call stopped at {self.file_path}:{self.line}:{self.col}",
-            "\nStack trace:"
+            f"Error: {self.message} on line {self.line}",
+            f"Location: {self.file_path}:{self.line}:{self.col}",
+            "\nContext:"
         ]
-        if line_idx > 0: error_msg.append(f"| {self.line - 1} {lines[line_idx - 1]}")
+        
+        if line_idx > 0:
+            error_msg.append(f"| {self.line - 1} {lines[line_idx - 1]}")
+            
         actual_line = lines[line_idx]
         error_msg.append(f"| {self.line} {actual_line}")
+        
         prefix = f"| {self.line} "
         pointer = " " * (len(prefix) + col_idx - 1) + "^~~~~~"
         error_msg.append(pointer)
-        if line_idx < len(lines) - 1: error_msg.append(f"| {self.line + 1} {lines[line_idx + 1]}")
+        
+        if line_idx < len(lines) - 1:
+            error_msg.append(f"| {self.line + 1} {lines[line_idx + 1]}")
+            
         return "\n".join(error_msg)
 
 class TypeChecker:
     def __init__(self, file_path, code):
-        # 🎭 Track both variables and functions!
         self.scopes = [{}] 
         self.file_path = file_path
         self.code = code
@@ -60,13 +67,9 @@ class TypeChecker:
                         raise DSLVibeError(f"undefined token '{val}'", node.line, col, self.file_path, self.code)
             
             elif isinstance(node, RunStmt):
-                # 🛡️ THE BASH XSS PROTECTOR:
-                # If it's a namespaced call (e.g. Human:sayHi), we assume it's a class method for now.
-                # If it's a plain identifier, it MUST be a defined function or a known command.
                 if ":" not in node.executable:
                     if not self.lookup(node.executable):
-                        # If it's not a function, we check if it was intended as a system command
-                        raise DSLVibeError(f"undefined token '{node.executable}' (If this is a system command, you gotta use 'run') 🛡️🛑", node.line, node.col, self.file_path, self.code)
+                        raise DSLVibeError(f"undefined token '{node.executable}' (use 'run' for system commands)", node.line, node.col, self.file_path, self.code)
                 
                 if node.arg_is_ref:
                     for arg, col, is_ref in zip(node.args, node.arg_cols, node.arg_is_ref):
@@ -74,7 +77,6 @@ class TypeChecker:
                             raise DSLVibeError(f"undefined token '{arg}'", node.line, col, self.file_path, self.code)
             
             elif isinstance(node, FuncDef):
-                # Define function in current scope BEFORE checking body
                 if self.lookup(node.name):
                      raise DSLVibeError(f"duplicate definition of function '{node.name}'", node.line, node.col, self.file_path, self.code)
                 self.current_scope()[node.name] = 'FUNC'

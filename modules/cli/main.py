@@ -1,7 +1,7 @@
 import sys
 import os
 
-# 🔧 Fix: Ensure the project root is in sys.path so we can find 'modules'
+# Ensure the project root is in sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 from modules.core.lexer import tokenize
@@ -11,7 +11,6 @@ from modules.engine.checker import TypeChecker, DSLVibeError
 
 def main():
     if len(sys.argv) < 2:
-        # 🚀 No file provided? Launch the REPL! ✨
         from modules.cli.repl import start_repl
         start_repl()
         return
@@ -25,7 +24,6 @@ def main():
         parser = Parser(tokens)
         nodes = parser.parse_all()
         
-        # 🛡️ THE BOUNCER ENTERS THE CHAT (With elite error training!)
         checker = TypeChecker(file_path, code)
         checker.check(nodes)
         
@@ -35,7 +33,7 @@ def main():
         print(e)
         sys.exit(1)
     except Exception as e:
-        print(f"Bummer! Error: {e}")
+        print(f"Error: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":
