@@ -1,6 +1,6 @@
 # bashDSL: The "TypeScript of Bash"
 
->[!WARN]
+>[!WARNING]
 >this project is in beta stage (and also half AI driven), use it as your own risk
 
 bashDSL is a simple and strict DSL that transpiles to POSIX-compliant Bash. It focuses on safety, strict typing, and modern development experience for shell scripting. Built with Python 3 Standard Library.
