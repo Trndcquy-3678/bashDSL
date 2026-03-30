@@ -22,6 +22,16 @@ class TestRunner:
         
         print("-" * 60)
         print(f"Test Suite Results: Passed: {passed}, Failed: {failed}")
+        
+        # 🎮 Run REPL Integration Test
+        print("\nRunning REPL Integration Check...")
+        repl_result = subprocess.run([self.python_path, 'tests/test_repl.py'], capture_output=True, text=True)
+        if repl_result.returncode == 0:
+            print("PASS: REPL Session Test ✨")
+        else:
+            print(f"FAIL: REPL Session Test\n{repl_result.stdout}\n{repl_result.stderr}")
+            failed += 1
+
         if failed > 0:
             sys.exit(1)
 
