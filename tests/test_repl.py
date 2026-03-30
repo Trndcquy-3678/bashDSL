@@ -5,10 +5,8 @@ import os
 def test_repl_session():
     print("Testing REPL interactive session...")
     
-    # Path to main.py
     main_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
     
-    # Start REPL
     process = subprocess.Popen(
         [sys.executable, '-m', 'modules.cli.main'],
         stdin=subprocess.PIPE,
@@ -18,7 +16,6 @@ def test_repl_session():
         cwd=main_path
     )
 
-    # Commands to run
     commands = [
         "var x = 42;",
         "out x;",
@@ -30,7 +27,6 @@ def test_repl_session():
     full_input = "\n".join(commands) + "\n"
     stdout, stderr = process.communicate(input=full_input, timeout=10)
 
-    # Verify output
     expected_outputs = ["42", "hi"]
     for expected in expected_outputs:
         if expected not in stdout:
@@ -38,7 +34,7 @@ def test_repl_session():
             print(f"STDOUT: {stdout}")
             return False
 
-    print("REPL session test PASSED! ✨")
+    print("REPL session test PASSED")
     return True
 
 if __name__ == "__main__":
