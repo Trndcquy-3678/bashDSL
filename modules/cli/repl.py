@@ -17,23 +17,28 @@ def start_repl():
 
     checker = TypeChecker("<repl>", "")
     
-    # Persistent shell process
+    # Persistent shell process with piped output
     shell = subprocess.Popen(
         ['/bin/sh'],
         stdin=subprocess.PIPE,
-        stdout=None,
-        stderr=None,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
         bufsize=1
     )
 
     while True:
         try:
-            code = input("> ")
-            if code.strip() == "exit":
+            line = input("> ")
+            if line.strip() == "exit":
                 break
-            if not code.strip():
+            if not line.strip():
                 continue
+
+            code = line
+            while code.count('{') > code.count('}'):
+                more = input("... ")
+                code += "\n" + more
 
             tokens = tokenize(code)
             parser = Parser(tokens)
@@ -47,8 +52,18 @@ def start_repl():
             
             bash_code = generate_bash(nodes, skip_cleanup=True)
             
+            # Execute bash code and wait for sentinel
+            sentinel = "__BASHDSL_REPL_DONE__"
             shell.stdin.write(bash_code + "\n")
+            shell.stdin.write(f"echo {sentinel}\n")
             shell.stdin.flush()
+            
+            # Synchronize output: Read until sentinel is found
+            while True:
+                out_line = shell.stdout.readline()
+                if not out_line or sentinel in out_line:
+                    break
+                print(out_line, end="")
             
         except EOFError:
             print("\nExiting.")
