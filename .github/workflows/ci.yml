@@ -9,14 +9,26 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+    
     - name: Install Ruff
       run: pip install ruff
-    - name: Lint and Format Check
+    
+    - name: Lint and Format Fix
       run: |
-        ruff check .
-        ruff format --check .
+        ruff check . --fix
+        ruff format .
+    
+    - name: Auto Commit Fixes
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "chore: auto lint and format fixes"
+        commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
   test:
     needs: lint
