@@ -15,7 +15,8 @@ class Parser:
     def consume(self, expected_type: str = None) -> Token:
         token = self.peek()
         if not token:
-            raise EOFError("Unexpected end of input")
+            # Fix: Use SyntaxError instead of EOFError to avoid REPL crashes
+            raise SyntaxError("Unexpected end of input")
         if expected_type and token.type != expected_type:
             raise SyntaxError(f"Line {token.line}, Col {token.col}: Expected {expected_type}, but got {token.type} ('{token.value}')")
         self.pos += 1
@@ -59,7 +60,6 @@ class Parser:
             else:
                 return self.parse_run()
         
-        # Allow starting a statement with a STRING (e.g. "wget" "url")
         if token.type == 'STRING':
             return self.parse_run()
         
@@ -74,7 +74,7 @@ class Parser:
         self.consume('ASSIGN')
         val_token = self.peek()
         val, val_col = val_token.value, val_token.col
-        self.consume() # consume value
+        self.consume()
         is_ref = val_token.type == 'IDENT'
         vtype = 'INT' if val_token.type == 'NUMBER' else 'STRING'
         if self.peek() and self.peek().type == 'SEMICOLON':
@@ -164,7 +164,6 @@ class Parser:
         token = self.peek()
         line, col = token.line, token.col
         
-        # Executable can be an IDENT or a STRING
         if token.type not in ['IDENT', 'STRING']:
             raise SyntaxError(f"Line {line}, Col {col}: Expected command name, but got {token.type}")
         
